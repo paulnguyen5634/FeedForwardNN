@@ -67,3 +67,28 @@ class NeuralNet(nn.Module):
     
 model = NeuralNet(input_size, hidden_size, num_classes).to(device)
 
+# loss and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate) 
+
+# Training loop
+n_total_steps = len(train_loader)
+for epoch in range(num_epochs):
+    for i, (images, labels) in enumerate(train_loader): # The enumerate function will give us index and data (a tuple of images and labels)
+        # we need to reshape images: 100,1,28,28
+        # inputsize: 100, 784
+        images = images.reshape(-1, 28*28).to(device)
+        labels = labels.to(device)
+
+        # Froward
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+
+        # Backward
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if (i+1) % 100 == 0:
+            print(f'epoch {epoch+1} / {num_epochs}, step {i+1} / {n_total_steps}, loss = {loss.item():.4f}')
+
