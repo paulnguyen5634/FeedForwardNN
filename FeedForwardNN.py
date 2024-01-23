@@ -92,3 +92,25 @@ for epoch in range(num_epochs):
         if (i+1) % 100 == 0:
             print(f'epoch {epoch+1} / {num_epochs}, step {i+1} / {n_total_steps}, loss = {loss.item():.4f}')
 
+# test
+with torch.no_grad():
+    n_correct = 0
+    n_samples = 0
+    for images, labels in test_loader:
+        # we need to reshape images: 100,1,28,28
+        # inputsize: 100, 784
+        images = images.reshape(-1, 28*28).to(device)
+        labels = labels.to(device)
+
+        # Our fully trained model
+        outputs = model(images)
+
+        # Will return the value and index 
+        _, predictions = torch.max(outputs, 1)
+        n_samples += labels.shape[0]
+        # For every correct prediction we will add one
+        n_correct += (predictions == labels).sum().item()
+
+    accuracy = 100.0 * n_correct / n_samples
+    print(f'Accuracy = {accuracy}')
+
